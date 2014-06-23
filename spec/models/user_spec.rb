@@ -1,11 +1,20 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :integer         not null, primary key
+#  name            :string(255)
+#  email           :string(255)
+#  created_at      :datetime        not null
+#  updated_at      :datetime        not null
+#  password_digest :string(255)
+#
+
 require 'spec_helper'
 
 describe User do
-
-  before do
-    @user = User.new(name: "Example User", email: "user@example.com",
-                     password: "foobar", password_confirmation: "foobar")
-  end
+  before { @user = User.new(name: "Example User", email: "user@example.com", 
+                            password: "foobar", password_confirmation: "foobar") }
 
   subject { @user }
 
@@ -78,11 +87,29 @@ describe User do
   describe "when email address is already taken" do
     before do
       user_with_same_email = @user.dup
+      user_with_same_email.save
+    end
+
+    it { should_not be_valid }
+  end
+
+  describe "when email address is already taken" do
+    before do
+      user_with_same_email = @user.dup
       user_with_same_email.email = @user.email.upcase
       user_with_same_email.save
     end
 
     it { should_not be_valid }
+  end
+
+  describe "email address with mixed case" do
+    let(:mixed_case_email) { "Foo@ExAMPle.CoM" }
+    it "should be saved as all lower case" do
+      @user.email = mixed_case_email
+      @user.save
+      expect(@user.reload.email).to eq mixed_case_email.downcase
+    end
   end
 
   describe "when password is not present" do
@@ -98,11 +125,6 @@ describe User do
     it { should_not be_valid }
   end
 
-  describe "with a password that's too short" do
-    before { @user.password = @user.password_confirmation = "a" * 5 }
-    it { should be_invalid }
-  end
-
   describe "return value of authenticate method" do
     before { @user.save }
     let(:found_user) { User.find_by(email: @user.email) }
@@ -113,10 +135,14 @@ describe User do
 
     describe "with invalid password" do
       let(:user_for_invalid_password) { found_user.authenticate("invalid") }
-
       it { should_not eq user_for_invalid_password }
       specify { expect(user_for_invalid_password).to be_false }
     end
+  end
+
+  describe "with a password that's too short" do
+    before { @user.password = @user.password_confirmation = "a" * 5 }
+    it { should be_invalid }
   end
 
   describe "remember token" do
@@ -125,7 +151,6 @@ describe User do
   end
 
   describe "micropost associations" do
-
     before { @user.save }
     let!(:older_micropost) do
       FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
@@ -135,7 +160,7 @@ describe User do
     end
 
     it "should have the right microposts in the right order" do
-      expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+      expect(@user.microposts).to eq [newer_micropost, older_micropost]
     end
 
     it "should destroy associated microposts" do
@@ -152,7 +177,6 @@ describe User do
         FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
       end
       let(:followed_user) { FactoryGirl.create(:user) }
-
       before do
         @user.follow!(followed_user)
         3.times { followed_user.microposts.create!(content: "Lorem ipsum") }

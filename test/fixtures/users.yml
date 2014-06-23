@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: Person 1
+  email: person_1@example.com
+  password_digest: <%= BCrypt::Password.create('foobar') %>
+  admin: false
+
+two:
+  name: Person 2
+  email: person_2@example.com
+  password_digest: <%= BCrypt::Password.create('foobar') %>
+  admin: true
+
+admin:
+  name: Admin
+  email: admin@example.com
+  password_digest: <%= BCrypt::Password.create('foobar') %>
+  admin: true
+
+<% 1.upto(30) do |i| %>
+user_<%= i %>:
+  name: Example <%= i %>
+  email: example_<%= i %>@example.com
+  password_digest: <%= BCrypt::Password.create('foobar') %>
+  admin: false
+<% end %>

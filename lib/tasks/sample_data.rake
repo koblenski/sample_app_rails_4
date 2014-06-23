@@ -14,11 +14,11 @@ def make_users
                        password_confirmation: "foobar",
                        admin: true)
   99.times do |n|
-    name  = Faker::Name.name
+    name = Faker::Name.name
     email = "example-#{n+1}@railstutorial.org"
-    password  = "password"
-    User.create!(name:     name,
-                 email:    email,
+    password = "password"
+    User.create!(name: name,
+                 email: email,
                  password: password,
                  password_confirmation: password)
   end
@@ -34,9 +34,9 @@ end
 
 def make_relationships
   users = User.all
-  user  = users.first
+  user = users.first
   followed_users = users[2..50]
-  followers      = users[3..40]
+  followers = users[3..40]
   followed_users.each { |followed| user.follow!(followed) }
-  followers.each      { |follower| follower.follow!(user) }
+  followers.each { |follower| follower.follow!(user) }
 end
